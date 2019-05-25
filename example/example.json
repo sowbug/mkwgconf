@@ -1,0 +1,15 @@
+{
+    "interface": "wg0",
+    "ip_address_prefix": "10.1.0",
+    "clients": [
+        {"name": "pikachu"},
+        {"name": "bulbasaur"}
+    ],
+    "next_ip_address_suffix": 10,
+    "server": {
+        "public_address": "wg.example.com",
+        "public_port": 51820,
+        "intranet_ip_ranges": "192.168.100.0/24,192.168.101.0/24",
+        "dns": "8.8.8.8,8.8.4.4"
+    }
+}

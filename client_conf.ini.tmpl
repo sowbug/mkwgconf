@@ -1,0 +1,10 @@
+[Interface]
+Address = {{client.ip_address}}/32
+PrivateKey = {{client.private_key}}
+DNS = {{server.dns}}
+
+[Peer]
+PublicKey = {{server.public_key}}
+Endpoint = {{server.public_address}}:{{server.public_port}}
+AllowedIPs = {{allowed_ips}}
+PersistentKeepalive = 21

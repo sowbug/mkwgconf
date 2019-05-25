@@ -1,0 +1,14 @@
+[Interface]
+Address = {{server.ip_address}}/24
+SaveConfig = true
+PreUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = {{server.public_port}}
+PrivateKey = {{server.private_key}}
+{{#clients}}
+
+[Peer]
+# {{name}}
+PublicKey = {{public_key}}
+AllowedIPs = {{ip_address}}/32
+{{/clients}}
