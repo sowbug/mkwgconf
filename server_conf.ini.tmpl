@@ -1,8 +1,8 @@
 [Interface]
 Address = {{server.ip_address}}/24
 SaveConfig = true
-PreUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+PreUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o {{out_interface}} -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o {{out_interface}} -j MASQUERADE
 ListenPort = {{server.public_port}}
 PrivateKey = {{server.private_key}}
 {{#clients}}

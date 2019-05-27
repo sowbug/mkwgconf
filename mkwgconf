@@ -57,17 +57,17 @@ for client in iconf['clients']:
 
 # Generate Wireguard configurations.
 
-server_conf = open('%s.conf' % iconf['interface'], 'w')
+server_conf = open('%s.conf' % iconf['wg_interface'], 'w')
 server_conf.write(pystache.render(SERVER_TEMPLATE, iconf))
 
 for client in iconf['clients']:
-    client_conf = open('%s-%s-geo.conf' % (iconf['interface'], client['name']), 'w')
+    client_conf = open('%s-%s-geo.conf' % (iconf['wg_interface'], client['name']), 'w')
     client_conf.write(pystache.render(CLIENT_TEMPLATE,
                                       {'client': client,
                                        'server': iconf['server'],
                                        'allowed_ips': '0.0.0.0/0, ::/0'}))
     if iconf['server'].has_key('intranet_ip_ranges'):
-        client_conf = open('%s-%s-access.conf' % (iconf['interface'], client['name']), 'w')
+        client_conf = open('%s-%s-access.conf' % (iconf['wg_interface'], client['name']), 'w')
         client_conf.write(pystache.render(
             CLIENT_TEMPLATE,
             {'client': client,
