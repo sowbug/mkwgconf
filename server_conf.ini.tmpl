@@ -1,6 +1,6 @@
 [Interface]
 Address = {{server.ip_address}}/24
-SaveConfig = true
+SaveConfig = false
 PreUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o {{out_interface}} -j MASQUERADE
 PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o {{out_interface}} -j MASQUERADE
 ListenPort = {{server.public_port}}
