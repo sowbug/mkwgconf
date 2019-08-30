@@ -1,5 +1,6 @@
 {
-    "interface": "wg0",
+    "wg_interface": "wg0",
+    "out_interface": "eth0", 
     "ip_address_prefix": "10.1.0",
     "clients": [
         {"name": "pikachu"},
