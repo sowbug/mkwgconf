@@ -5,20 +5,24 @@ import json
 import pystache
 import subprocess
 import sys
+import os
 
 # Get the arguments from the command line.
 
 parser = argparse.ArgumentParser(
     description='Generate Wireguard configurations.')
-parser.add_argument('--interface_conf', dest='iconf',
-                    required=True,
-                    help='interface configuration file')
+parser.add_argument('--config', dest='iconf',
+                    default='wireguard.json',
+                    help='General configuration file')
 parser.add_argument('--server_template',
-                    required=True,
-                    help='server template file')
+                    default='server_config.tmpl',
+                    help='Server template')
 parser.add_argument('--client_template',
-                    required=True,
-                    help='client template file')
+                    default='client_config.tmpl',
+                    help='Client template')
+parser.add_argument('--outputdir',
+                    default='output',
+                    help='Output directory')
 args = parser.parse_args()
 
 # Read in all the configuration and template files.
@@ -31,6 +35,10 @@ with open(args.server_template, 'r') as f:
 
 with open(args.client_template, 'r') as f:
     CLIENT_TEMPLATE = f.read()
+
+if args.outputdir: 
+    if not os.path.exists(args.outputdir):
+        os.mkdir(args.outputdir)
 
 # Fill in any missing configuration values.
 
@@ -57,21 +65,24 @@ for client in iconf['clients']:
 
 # Generate Wireguard configurations.
 
-server_conf = open('%s.conf' % iconf['wg_interface'], 'w')
+server_conf = open(os.path.join(args.outputdir, '%s.conf' % (iconf['wg_interface'])), 'w')
 server_conf.write(pystache.render(SERVER_TEMPLATE, iconf))
 
 for client in iconf['clients']:
-    client_conf = open('%s-%s-geo.conf' % (iconf['wg_interface'], client['name']), 'w')
+    client_conf = open(os.path.join(args.outputdir, '%s-%s-full.conf' % (iconf['wg_interface'], client['name'])), 'w')
     client_conf.write(pystache.render(CLIENT_TEMPLATE,
                                       {'client': client,
                                        'server': iconf['server'],
                                        'allowed_ips': '0.0.0.0/0, ::/0'}))
     if iconf['server'].has_key('intranet_ip_ranges'):
-        client_conf = open('%s-%s-access.conf' % (iconf['wg_interface'], client['name']), 'w')
+        client_conf = open(os.path.join(args.outputdir, '%s-%s.conf' % (iconf['wg_interface'], client['name'])), 'w')
         client_conf.write(pystache.render(
             CLIENT_TEMPLATE,
             {'client': client,
              'server': iconf['server'],
              'allowed_ips': iconf['server']['intranet_ip_ranges']}))
 
-print json.dumps(iconf, indent=4)
+config_file = open(args.iconf, 'w')
+config_file.write(json.dumps(iconf, indent=4))
+
+print 'Configuration %s updated' % (args.iconf)
