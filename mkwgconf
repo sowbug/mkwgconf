@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import argparse
 import json
@@ -34,26 +34,28 @@ with open(args.client_template, 'r') as f:
 
 # Fill in any missing configuration values.
 
-if not iconf['server'].has_key('private_key'):
+if 'private_key' not in iconf['server']:
     iconf['server']['private_key'] = subprocess.check_output(
-        "wg genkey", shell=True).strip()
+        "wg genkey", shell=True).decode("utf-8").strip()
 
-if not iconf['server'].has_key('ip_address'):
+if 'ip_address' not in iconf['server']:
     iconf['server']['ip_address'] = iconf['ip_address_prefix'] + '.1'
 
 iconf['server']['public_key'] = subprocess.check_output(
     "echo '%s' | wg pubkey" %
-    iconf['server']['private_key'], shell=True).strip()
+    iconf['server']['private_key'], shell=True).decode("utf-8").strip()
 
 for client in iconf['clients']:
-    if not client.has_key('private_key'):
-        client['private_key'] = subprocess.check_output("wg genkey", shell=True).strip()
-    if not client.has_key('ip_address'):
+    if 'private_key' not in client:
+        client['private_key'] = subprocess.check_output(
+            "wg genkey",shell=True).decode("utf-8").strip()
+    if 'ip_address' not in client:
         client['ip_address'] = (iconf['ip_address_prefix'] + '.' +
                                 str(iconf['next_ip_address_suffix']))
         iconf['next_ip_address_suffix'] += 1
     client['public_key'] = subprocess.check_output(
-        "echo '%s' | wg pubkey" % client['private_key'], shell=True).strip()
+        "echo '%s' | wg pubkey" % client['private_key'],
+        shell=True).decode("utf-8").strip()
 
 # Generate Wireguard configurations.
 
@@ -61,17 +63,19 @@ server_conf = open('%s.conf' % iconf['wg_interface'], 'w')
 server_conf.write(pystache.render(SERVER_TEMPLATE, iconf))
 
 for client in iconf['clients']:
-    client_conf = open('%s-%s-geo.conf' % (iconf['wg_interface'], client['name']), 'w')
+    client_conf = open('%s-%s-geo.conf' % (iconf['wg_interface'],
+                                           client['name']), 'w')
     client_conf.write(pystache.render(CLIENT_TEMPLATE,
                                       {'client': client,
                                        'server': iconf['server'],
                                        'allowed_ips': '0.0.0.0/0, ::/0'}))
-    if iconf['server'].has_key('intranet_ip_ranges'):
-        client_conf = open('%s-%s-access.conf' % (iconf['wg_interface'], client['name']), 'w')
+    if 'intranet_ip_ranges' in iconf['server']:
+        client_conf = open('%s-%s-access.conf' % (iconf['wg_interface'],
+                                                  client['name']), 'w')
         client_conf.write(pystache.render(
             CLIENT_TEMPLATE,
             {'client': client,
              'server': iconf['server'],
              'allowed_ips': iconf['server']['intranet_ip_ranges']}))
 
-print json.dumps(iconf, indent=4)
+print(json.dumps(iconf, indent=4))
