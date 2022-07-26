@@ -19,7 +19,8 @@ want to be able to connect to your VPN.
 1. Edit anything else in the conf file, such as the name of the
 interface (it's usually wg0 in most Wireguard documentation), or the
 intranet IP address ranges that you want your clients to be able to
-access.
+access. *If your Wireguard server is a Raspberry Pi connected over
+wifi, then you probably want to change `out_interface` to `wlan0`.*
 
 1. `./mkwgconf --interface_conf=squirtle.json --server_template=server_conf.ini.tmpl --client_template=client_conf.ini.tmpl > squirtle-updated.json`
 
